@@ -46,3 +46,5 @@ jobs:
        - run: sudo apt-get install trivy
        - run: trivy plugin install github.com/umax/trivy-plugin-sonarqube
        - run: trivy plugin list
+       - run: trivy fs --scanners vuln,config,secret,license --format=json --output=trivy.json .
+       - run: trivy sonarqube trivy.json > sonarqube.json
