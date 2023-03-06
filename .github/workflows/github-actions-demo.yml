@@ -18,11 +18,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      - name: sonar-scanner
-        uses: sonarsource/sonarqube-scan-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
       - run: sudo apt-get install wget apt-transport-https gnupg lsb-release
       - run: wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
       - run: echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
@@ -32,8 +27,16 @@ jobs:
       - run: trivy plugin list
       - run: trivy fs --scanners vuln,config,secret,license --format=json --output=trivy.json .
       - run: trivy sonarqube trivy.json > sonarqube.json
-      - run: sonar-scanner -D sonar.externalIssuesReportPaths="sonarqube.json"
-
+      - name: sonar-scanner
+        uses: sonarsource/sonarqube-scan-action@master
+        with:
+           projectBaseDir: .
+           args: >
+            -D sonar.externalIssuesReportPaths="sonarqube.json"
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        
   trivyNormal:
     name: Trivy
     runs-on: ubuntu-20.04
