@@ -7,7 +7,7 @@ jobs:
     steps:
       - run: export TRIVY_VERSION=$(wget -qO - "https://api.github.com/repos/aquasecurity/trivy/releases/latest" | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
       - run: echo $TRIVY_VERSION
-      - run: wget --no-verbose https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz -O - | tar -zxvf
+      - run: wget --no-verbose https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz -O - | tar -zxvf -
       - run: ./trivy fs --scanners vuln,secret,config --exit-code 0 --format template --template "@contrib/gitlab-codequality.tpl" -o gl-codeclimate-fs.json .
       - run: ./trivy fs --scanners vuln,secret,config --exit-code 0 --format template --template "@contrib/html.tpl" -o report.html .
       - run: ./trivy fs --scanners vuln,secret,config --format template --template "@contrib/junit.tpl" -o junit-report.xml .
