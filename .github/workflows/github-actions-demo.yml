@@ -48,3 +48,4 @@ jobs:
        - run: trivy plugin list
        - run: trivy fs --scanners vuln,config,secret,license --format=json --output=trivy.json .
        - run: trivy sonarqube trivy.json > sonarqube.json
+       - run: sonar-scanner -D sonar.externalIssuesReportPaths="sonarqube.json"
