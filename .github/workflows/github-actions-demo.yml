@@ -12,5 +12,6 @@ jobs:
       uses: aquasecurity/trivy-action@master
       with:
         scan-type: 'fs'
+        security-checks: vuln,secret,config
         scan-ref: '.'
         trivy-config: trivy.yaml
