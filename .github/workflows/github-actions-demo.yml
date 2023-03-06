@@ -1,15 +1,20 @@
-name: Trivy
-run-name: ${{ github.actor }} scan
-on: [push]
+name: build
+on:
+  push:
+    branches:
+    - master
+  pull_request:
 jobs:
-  Explore-GitHub-Actions:
-    runs-on: ubuntu-latest
+  build:
+    name: Build
+    runs-on: ubuntu-20.04
     steps:
-      - run: export TRIVY_VERSION=$(wget -qO - "https://api.github.com/repos/aquasecurity/trivy/releases/latest" | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
-      - run: echo $TRIVY_VERSION
-      - run: wget --no-verbose https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz -O - | tar -zxvf -
-      - run: ./trivy fs --scanners vuln,secret,config --exit-code 0 --format template --template "@contrib/gitlab-codequality.tpl" -o gl-codeclimate-fs.json .
-      - run: ./trivy fs --scanners vuln,secret,config --exit-code 0 --format template --template "@contrib/html.tpl" -o report.html .
-      - run: ./trivy fs --scanners vuln,secret,config --format template --template "@contrib/junit.tpl" -o junit-report.xml .
-      - run: ./trivy fs --scanners vuln,secret,config --exit-code 0 .
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Run Trivy vulnerability scanner in fs mode
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        trivy-config: trivy.yaml
