@@ -18,7 +18,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  trivy:
+  trivyNormal:
     name: Trivy
     runs-on: ubuntu-20.04
     steps:
@@ -34,4 +34,15 @@ jobs:
         output: 'report.json'
         security-checks: 'vuln,secret,config'
         trivy-config: trivy.yaml
-    - run: trivy plugin install github.com/umax/trivy-plugin-sonarqube
+        
+    trivyCommand:
+       name: TrivyL
+       runs-on: ubuntu-20.04
+       steps:
+       - run: sudo apt-get install wget apt-transport-https gnupg lsb-release
+       - run: wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+       - run: echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+       - run: sudo apt-get update
+       - run: sudo apt-get install trivy
+       - run: trivy plugin install github.com/umax/trivy-plugin-sonarqube
+       - run: trivy plugin list
