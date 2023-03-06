@@ -35,7 +35,7 @@ jobs:
         security-checks: 'vuln,secret,config'
         trivy-config: trivy.yaml
         
-    trivyCommand:
+  trivyCommand:
        name: TrivyL
        runs-on: ubuntu-20.04
        steps:
